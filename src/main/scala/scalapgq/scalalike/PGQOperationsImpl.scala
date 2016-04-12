@@ -8,9 +8,9 @@ class PGQOperationsImpl(url: String, user: String, password: String) extends PGQ
   
   type Session = DBSession
   
-  ConnectionPool.add('named, url, user, password)
+  val cp = CommonsConnectionPoolFactory.apply(url, user, password)
   
-  override def localTx[A](execution: DBSession => A) = NamedDB('named).localTx(execution)
+  override def localTx[A](execution: DBSession => A) = using(DB(cp.borrow())){db => db.localTx { execution}} 
   
   override def createQueue(queueName: String)(implicit s: Session): Boolean = {
     sql"select pgq.create_queue(${queueName})".map(_.boolean(1)).single.apply().getOrElse(false)

@@ -9,17 +9,10 @@ import akka.stream.testkit.scaladsl._
 import scala.concurrent.duration._
 import scalikejdbc._
 
-class PGQConsumerSpec extends TestKit(ActorSystem("IntegrationSpec")) with WordSpecLike with Matchers with BeforeAndAfter {
+class PGQConsumerSpec extends TestKit(ActorSystem("IntegrationSpec")) with WordSpecLike with PGQSpec with Matchers with BeforeAndAfter {
   
   implicit val mat = ActorMaterializer()(system)
   implicit val ec = system.dispatcher
-  
-//  ConnectionPool.singleton("jdbc:postgresql://127.0.0.1/db", "user", "pass")
-  GlobalSettings.loggingSQLAndTime = LoggingSQLAndTimeSettings(enabled = true, singleLineMode = true)
-
-  val PostgresUser = "PostgresUser"
-  val PostgresUrl = s"jdbc:postgresql://127.0.0.1/$PostgresUser"
-  val PostgresPassword = "PostgresPassword"
   
   val ops = new scalalike.PGQOperationsImpl(PostgresUrl, PostgresUser, PostgresPassword)
     

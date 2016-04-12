@@ -6,14 +6,7 @@ import org.scalatest.concurrent._
 import scala.concurrent.duration._
 import scalikejdbc._
 
-class PGQOperationsSpec extends FlatSpec with Matchers with BeforeAndAfter with Eventually with IntegrationPatience {
-  
-//  ConnectionPool.singleton("jdbc:postgresql://127.0.0.1/instafin", "instafin", "instafin")
-  GlobalSettings.loggingSQLAndTime = LoggingSQLAndTimeSettings(enabled = true, singleLineMode = true)
-  
-  val PostgresUser = "PostgresUser"
-  val PostgresUrl = s"jdbc:postgresql://127.0.0.1/$PostgresUser"
-  val PostgresPassword = "PostgresPassword"
+class PGQOperationsSpec extends WordSpec with PGQSpec with Matchers with BeforeAndAfter with Eventually with IntegrationPatience {
   
   val pgq = new PGQOperationsImpl(PostgresUrl, PostgresUser, PostgresPassword)
   val queueName = "test_queue"
@@ -46,21 +39,21 @@ class PGQOperationsSpec extends FlatSpec with Matchers with BeforeAndAfter with 
       }
     }
   }
-  "PGQ" should 
+  "PGQ" should {
     "create_queue and drop queue" in {
       pgq.localTx{implicit session =>
         pgq.createQueue(queueName) shouldEqual true
         pgq.dropQueue(queueName) shouldEqual true
       }
     }
-    it should "register and unregister consumer" in {
+    "register and unregister consumer" in {
       pgq.localTx{implicit session =>
         pgq.createQueue(queueName) shouldEqual true 
         pgq.registerConsumer(queueName, consumerName) shouldEqual true
         pgq.unRegisterConsumer(queueName, consumerName) shouldEqual true
       }
     }
-    it should "insert and consume event" in {
+    "insert and consume event" in {
       val consumerName = "test_consumer"
       pgq.localTx{implicit session =>
         pgq.createQueue(queueName) shouldEqual true 
@@ -77,7 +70,7 @@ class PGQOperationsSpec extends FlatSpec with Matchers with BeforeAndAfter with 
     }
     
     
-    it should "rollback inserted events" in {
+    "rollback inserted events" in {
       pgq.localTx{implicit session =>
         pgq.createQueue(queueName) shouldEqual true 
         pgq.registerConsumer(queueName, consumerName) shouldEqual true
@@ -101,4 +94,5 @@ class PGQOperationsSpec extends FlatSpec with Matchers with BeforeAndAfter with 
       events should not contain (Some("data1"))
       events should contain (Some("data2"))  
     }
+  }
 }
