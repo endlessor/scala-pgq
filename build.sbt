@@ -1,6 +1,8 @@
 name := """scala-pgq"""
 
-version := "1.0"
+organization := "com.github.jtjeferreira"
+
+licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html"))
 
 scalaVersion := "2.11.7"
 
